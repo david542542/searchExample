@@ -76,11 +76,11 @@ class Search:
                 'searchType': SEARCH_TYPE_EXACT,
                 'minLength': None,
                 'maxLength': None,
-                'minValue': 1,
-                'maxValue': 1000001,
-                'hasOrStartsWithNumber': None,
+                'minValue': None,
+                'maxValue': None,
                 'isAllLower': None,
                 'isAllUpper': None,
+                'containsNumericStart': None,
                 'containsMultipleWords': None
             },
             'date': {
@@ -88,11 +88,11 @@ class Search:
                 'searchType': SEARCH_TYPE_EXACT,
                 'minLength': None,
                 'maxLength': None,
-                'minValue': 41640,
-                'maxValue': 43168,
-                'hasOrStartsWithNumber': None,
+                'minValue': None,
+                'maxValue': None,
                 'isAllLower': None,
                 'isAllUpper': None,
+                'containsNumericStart': None,
                 'containsMultipleWords': None
             },
             'instance_id': {
@@ -100,35 +100,35 @@ class Search:
                 'searchType': SEARCH_TYPE_EXACT,
                 'minLength': None,
                 'maxLength': None,
-                'minValue': 246263,
-                'maxValue': 197928126,
-                'hasOrStartsWithNumber': None,
+                'minValue': None,
+                'maxValue': None,
                 'isAllLower': None,
                 'isAllUpper': None,
+                'containsNumericStart': None,
                 'containsMultipleWords': None
             },
             'territory_id': {
                 'type': DATA_TYPE_STRING,
                 'searchType': SEARCH_TYPE_EDGE,
-                'minLength': 2,
-                'maxLength': 2,
+                'minLength': None,
+                'maxLength': None,
                 'minValue': None,
                 'maxValue': None,
-                'hasOrStartsWithNumber': None,
                 'isAllLower': None,
                 'isAllUpper': None,
+                'containsNumericStart': None,
                 'containsMultipleWords': None
             },
             'code':  {
                 'type': DATA_TYPE_STRING,
                 'searchType': SEARCH_TYPE_EDGE,
-                'minLength': 5,
-                'maxLength': 7,
+                'minLength': None,
+                'maxLength': None,
                 'minValue': None,
                 'maxValue': None,
-                'hasOrStartsWithNumber': False,
                 'isAllLower': None,
                 'isAllUpper': None,
+                'containsNumericStart': None,
                 'containsMultipleWords': None
             },
             'price': {
@@ -136,23 +136,23 @@ class Search:
                 'searchType': SEARCH_TYPE_EXACT,
                 'minLength': None,
                 'maxLength': None,
-                'minValue': 0,
-                'maxValue': 550000,
-                'hasOrStartsWithNumber': None,
+                'minValue': None,
+                'maxValue': None,
                 'isAllLower': None,
                 'isAllUpper': None,
+                'containsNumericStart': None,
                 'containsMultipleWords': None
             },
             'currency_code_id': {
                 'type': DATA_TYPE_STRING,
                 'searchType': SEARCH_TYPE_EDGE,
-                'minLength': 3,
-                'maxLength': 3,
+                'minLength': None,
+                'maxLength': None,
                 'minValue': None,
                 'maxValue': None,
-                'hasOrStartsWithNumber': None,
                 'isAllLower': None,
                 'isAllUpper': None,
+                'containsNumericStart': None,
                 'containsMultipleWords': None
             },
             'price_in_usd': {
@@ -160,11 +160,11 @@ class Search:
                 'searchType': SEARCH_TYPE_EXACT,
                 'minLength': None,
                 'maxLength': None,
-                'minValue': 0.01,
-                'maxValue': 49.26,
-                'hasOrStartsWithNumber': None,
+                'minValue': None,
+                'maxValue': None,
                 'isAllLower': None,
                 'isAllUpper': None,
+                'containsNumericStart': None,
                 'containsMultipleWords': None
             },
         }
@@ -314,19 +314,30 @@ class Search:
             # So that we can skip columns that are not of that type
             term_is_string, term_is_decimal, term_is_integer = False, False, False
             try:
-                assert term[0] != '0' # a number such as "02" should be treated as a string, not a number
                 float(term)
             except:
-                term_is_string = True # Can be a date, too -- '2014-01-01'
+                term_is_string = True
             else:
                 term_is_integer = float(term) == int(float(term))
                 term_is_decimal = not term_is_integer
+                term_is_string = term[0] == '0' # Allow a leading 0 item, such as "0005" to be treated as both a string a number
+                                                # Depending on the column it is compared against
                 
                 
             valid_fields_to_search_against = []
             for field, field_info in self.COLUMN_INFO.items():
                 
                 # print 'Term: %s | IsString: %s | IsInteger: %s | IsDecimal: %s' % (term, term_is_string, term_is_integer, term_is_decimal)
+                
+                # If the containsMultipleWords field has not been set yet (i.e., it is None)
+                # Then we must treat a SEARCH_TYPE_EXACT search as a SEARCH_TYPE_EDGE because
+                # We've broken up all keywords.
+                # EXAMPLE:
+                #     Search ==> "Terminator 2"
+                #     Tokenized As: ['Terminator', '2']
+                #     When we search these words individually, both "Terminator" and "2"
+                #     Will fail when doing an exact match against "Terminator 2".
+                #     Thus, with an unknown "containsMultipleWords", we must downgrade an Exact string search.
 
 
                 # (1) SEARCH OFF SKIPS
