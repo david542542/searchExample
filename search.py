@@ -60,7 +60,7 @@ class Search:
         
         self.SEARCH_INFO = {
             'OriginalSearch': '',
-            'TokensToSearch': [],
+            'TokenizedSearch': [],
             'MissingTokens': [],
             'Parsed': {
                 # 4019: {
@@ -126,7 +126,7 @@ class Search:
                 'maxLength': 7,
                 'minValue': None,
                 'maxValue': None,
-                'hasOrStartsWithNumber': None,
+                'hasOrStartsWithNumber': False,
                 'isAllLower': None,
                 'isAllUpper': None,
                 'containsMultipleWords': None
