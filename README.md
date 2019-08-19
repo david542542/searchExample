@@ -2,7 +2,6 @@
 
 ### Run
 
-The
 ```
 $ # everything after `search.py` is the search string
 $ python search.py hdbuy 4.99 2014-01-01 mar. 4, 2014 01:02:0 terminator 2
@@ -10,10 +9,8 @@ $ python search.py hdbuy 4.99 2014-01-01 mar. 4, 2014 01:02:0 terminator 2
 ```
 
 ### Helper File
-I have added in a helper file to emulate what the data looks like in wasm.
-For example, having a date stored as a number instead of a string of "2014-01-01".
-However, most of this includes hard-coded data, so will take additional set-up
-If we wanted to use it with other files (for purposes of this, I only used the one file).
+I have added in a helper file, `Sales1M_WasmFormatted.json` to emulate what the data looks like in wasm.
+For example, having a date stored as a number instead of the string `"2014-01-01"`.
 
 ### Search Builder
 The `search.py` file is where all the tokenizing and search logic occurs.
