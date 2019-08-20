@@ -647,7 +647,7 @@ class Search:
 
             if has_row_match:
 
-                if fields_with_partial_matches:
+                if not fields_with_partial_matches:
                     matches_at_index.add(idx)
                 else:
                     # This is simple, we can just do a reverse search
